@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="GeoJSON.Net" Version="1.1.70" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
   </ItemGroup>
 
 </Project>

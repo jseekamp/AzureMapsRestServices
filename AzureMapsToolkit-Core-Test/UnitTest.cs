@@ -10,17 +10,25 @@ using AzureMapsToolkit.Traffic;
 using AzureMapsToolkit.Render;
 using AzureMapsToolkit;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace AzureMapsToolkit_Core_Test
 {
-    public class UnitTest
+    public class UnitTest : IClassFixture<TestFixture>
     {
         public const string _KEY = "";
+        public HttpClient client;
+
+        public UnitTest(TestFixture fixture)
+        {
+            var factory = (IHttpClientFactory)fixture.ServiceProvider.GetService(typeof(IHttpClientFactory));
+            client = factory.CreateClient();
+        }
 
         [Fact]
         public void InvalidIPCountry()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var res = am.GetIPToLocation("83.10.0.3").Result;
 
             Assert.NotEqual("SE", res.Result.CountryRegion.IsoCode);
@@ -30,7 +38,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void ValidIPCountry()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var res = am.GetIPToLocation("83.68.254.182").Result;
 
             Assert.Equal("SE", res.Result.CountryRegion.IsoCode);
@@ -40,7 +48,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void InvaliddIPAddress()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var res = am.GetIPToLocation("perfa").Result;
             Assert.True(res.Error != null);
         }
@@ -48,7 +56,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetCopyrightCaption()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var result = am.GetCopyrightCaption().Result;
             Assert.Contains("TomTom", result.Result.CopyrightsCaption);
         }
@@ -56,7 +64,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetCopyrightForTile()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new AzureMapsToolkit.Render.CopyrightForTileRequest
             {
                 Zoom = 6,
@@ -71,7 +79,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetCopyrightForWorld()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var resp = am.GetCopyrightForWorld().Result;
 
         }
@@ -79,7 +87,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetCopyrightFromBoundingBox()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new CopyrightFromBoundingBoxRequest
             {
                 Mincoordinates = "52.41064,4.84228",
@@ -94,7 +102,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetMapImage()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new MapImageRequest
             {
                 Format = AzureMapsToolkit.Render.RasterTileFormat.png,
@@ -110,7 +118,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetMapImageryTilePreview()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new MapImageryTileRequest
             {
                 Format = RasterTileFormat.png,
@@ -127,7 +135,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetMapTile()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new MapTileRequest
             {
                 Format = TileFormat.png,
@@ -146,7 +154,7 @@ namespace AzureMapsToolkit_Core_Test
         public void GetRouteDirections()
         {
 
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new RouteRequestDirections
             {
                 Query = "52.50931,13.42936:52.50274,13.43872"
@@ -160,7 +168,7 @@ namespace AzureMapsToolkit_Core_Test
         public void GetRouteDirectionsError()
         {
 
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new RouteRequestDirections
             {
                 Query = "52.50931,13.42936:52.50274,13.43872",
@@ -174,7 +182,7 @@ namespace AzureMapsToolkit_Core_Test
         public void GetRouteRange()
         {
 
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new RouteRangeRequest
             {
                 Query = "52.50931,13.42936",
@@ -189,7 +197,7 @@ namespace AzureMapsToolkit_Core_Test
         public void GetPostRouteDirections()
         {
 
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new List<RouteRequestDirections>();
             req.Add(new RouteRequestDirections
             {
@@ -212,7 +220,7 @@ namespace AzureMapsToolkit_Core_Test
         public void GetDistanceMatrix()
         {
 
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new RouteMatrixRequest();
             req.RouteType = RouteType.Fastest;
 
@@ -242,7 +250,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetSearchAddress()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
 
             var searchAddressRequest = new SearchAddressRequest
             {
@@ -260,7 +268,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetSearchAddressReverse()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
 
             var req = new SearchAddressReverseRequest
             {
@@ -277,7 +285,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetSearchAddressReverseCrossStreet()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
 
             var req = new SearchAddressReverseCrossStreetRequest
             {
@@ -294,7 +302,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetSearchAddressStructured()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new SearchAddressStructuredRequest
             {
                 CountryCode = "SE",
@@ -316,7 +324,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetSearchFuzzy()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new SearchFuzzyRequest
             {
                 Query = "seattle"
@@ -331,7 +339,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetSearchNearby()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new SearchNearbyRequest
             {
                 Lat = "40.70627",
@@ -350,7 +358,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetSearchPoi()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new SearchPoiRequest
             {
                 Query = "juice bars",
@@ -369,7 +377,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetSearchPoiCategory()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new SearchPoiCategoryRequest
             {
                 Query = "atm",
@@ -388,7 +396,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetSearchAddressBatch()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req1 = new SearchAddressRequest
             {
                 Query = "400 Broad St, Seattle, WA 98109",
@@ -417,7 +425,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetSearchAddressReverseBatch()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var q1 = new SearchAddressReverseRequest
             {
                 Query = "48.858561,2.294911"
@@ -444,7 +452,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetSearchAlongRoute()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
 
             var req = new SearchAlongRouteRequest
             {
@@ -474,7 +482,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetSeachFuzzyBatch()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
 
             var q1 = new SearchFuzzyRequest
             {
@@ -511,7 +519,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void SearchInsidePolygon()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var coll = JsonConvert.DeserializeObject<GeometryCollection>("{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Polygon\",\"coordinates\":[[[-122.43576049804686,37.7524152343544],[-122.43301391601562,37.70660472542312],[-122.36434936523437,37.712059855877314],[-122.43576049804686,37.7524152343544]]]}]}");
             var d = am.GetSearchInsidePolygon(new SearchInsidePolygonRequest
             {
@@ -525,7 +533,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetTimeZoneByCoordinates()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new TimeZoneRequest
             {
                 Query = "47.0,-122",
@@ -541,7 +549,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetTimeZoneById()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new TimeZoneRequest
             {
                 Query = "Europe/Stockholm",
@@ -556,7 +564,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetTimezoneIANA()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
 
             var r = am.GetTimezoneEnumIANA().Result;
 
@@ -567,7 +575,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetTimezoneEnumWindows()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
 
             var r = am.GetTimezoneEnumWindows().Result;
 
@@ -578,7 +586,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetTimezoneIANAVersion()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
 
             var r = am.GetTimezoneIANAVersion().Result;
 
@@ -591,7 +599,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetTimezoneWindowsToIANA()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new TimezoneWindowsToIANARequest
             {
                 Query = "pacific standard time"
@@ -606,7 +614,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetTrafficFlowSegment()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new TrafficFlowSegmentRequest
             {
                 Query = "52.41072,4.84239",
@@ -623,7 +631,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetTrafficFlowTile()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new TrafficFlowTileRequest
             {
                 Style = TrafficFlowSegmentStyle.Absolute,
@@ -640,7 +648,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetTrafficIncidentTile()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new TrafficIncidentTileRequest
             {
                 Style = TrafficIncidentTileStyle.s1,
@@ -657,7 +665,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetTrafficIncidentDetail()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new TrafficIncidentDetailRequest
             {
                 Style = TrafficIncidentTileStyle.s3,
@@ -675,7 +683,7 @@ namespace AzureMapsToolkit_Core_Test
         [Fact]
         public void GetTrafficIncidentViewport()
         {
-            var am = new AzureMapsToolkit.AzureMapsServices(_KEY);
+            var am = new AzureMapsToolkit.AzureMapsServices(_KEY, client);
             var req = new TrafficIncidentViewportRequest
             {
                 Boundingbox = "-939584.4813015489,-23954526.723651607,14675583.153020501,25043442.895825107",

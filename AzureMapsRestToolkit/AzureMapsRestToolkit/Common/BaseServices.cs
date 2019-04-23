@@ -12,27 +12,26 @@ namespace AzureMapsToolkit.Common
     public class BaseServices
     {
         internal string Key { get; set; }
-        public BaseServices(string key)
+        internal HttpClient Client { get; set; }
+
+        public BaseServices(string key, HttpClient client)
         {
             Key = key;
+            Client = client;
         }
 
         internal async Task<HttpResponseMessage> GetHttpResponseMessage(string url, string data)
         {
-
-            using (var client = new HttpClient())
+            using (var request = new HttpRequestMessage(HttpMethod.Post, url))
             {
-                using (var request = new HttpRequestMessage(HttpMethod.Post, url))
+                using (var content = new StringContent(data, Encoding.UTF8, "application/json"))
                 {
-                    using (var content = new StringContent(data, Encoding.UTF8, "application/json"))
-                    {
-                        request.Content = content;
-                        var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+                    request.Content = content;
+                    var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
-                        response.EnsureSuccessStatusCode();
-                        return response;
+                    response.EnsureSuccessStatusCode();
+                    return response;
 
-                    }
                 }
             }
         }
@@ -190,7 +189,7 @@ namespace AzureMapsToolkit.Common
 
                 throw new AzureMapsException(ex);
             }
-            
+
         }
 
     }
